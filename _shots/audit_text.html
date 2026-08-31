@@ -1,0 +1,33 @@
+<!doctype html><html><head><meta charset="utf-8"><title>textfix audit</title></head>
+<body style="margin:0">
+<pre id="out">running...</pre>
+<script>
+var W=[320,360,390,414],out=[],done=0;
+W.forEach(function(w){
+  var f=document.createElement('iframe');
+  f.style.cssText='border:0;display:block;width:'+w+'px;height:900px';
+  f.src='../index.html';
+  f.onload=function(){
+    setTimeout(function(){
+    try{
+      var d=f.contentDocument,cw=d.documentElement.clientWidth,
+          sw=(d.scrollingElement||d.documentElement).scrollWidth,
+          offs=[];
+      d.querySelectorAll('body *').forEach(function(el){
+        var r=el.getBoundingClientRect();
+        if(r.right>cw+1||r.left<-1){
+          var c=el.className;
+          c=(typeof c==='string')?c.split(' ')[0]:'svg';
+          offs.push(el.tagName+'.'+c+' L'+Math.round(r.left)+' R'+Math.round(r.right));
+        }
+      });
+      offs=offs.slice(0,14);
+      out.push({w:w,client:cw,scroll:sw,overflow:sw>cw+1,n:offs.length,list:offs});
+      }catch(e){out.push({w:w,err:String(e)});}
+      if(++done===W.length)document.getElementById('out').textContent='AUDIT::'+JSON.stringify(out);
+    },500);
+  };
+  document.body.appendChild(f);
+});
+</script>
+</body></html>

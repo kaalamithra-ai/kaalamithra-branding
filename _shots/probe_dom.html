@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>body{margin:0;background:#222}iframe{border:2px solid red;display:block;margin:10px}h3{color:#fff;font-family:monospace;margin:8px 10px 0}</style><title>PROBE {"320":{"deSW":311,"mq480":true,"h1fs":"21px","h1w":270,"f":".39","hvL":34,"hvR":284,"dashW":172,"dashL":73},"360":{"deSW":350,"mq480":true,"h1fs":"22.32px","h1w":310,"f":".45","hvL":36,"hvR":324,"dashW":198,"dashL":81},"390":{"deSW":380,"mq480":true,"h1fs":"24.18px","h1w":340,"f":".48","hvL":41,"hvR":348,"dashW":211,"dashL":89},"414":{"deSW":404,"mq480":true,"h1fs":"25.668px","h1w":364,"f":".50","hvL":47,"hvR":367,"dashW":220,"dashL":97},"480":{"deSW":470,"mq480":true,"h1fs":"29.76px","h1w":430,"f":".60","hvL":49,"hvR":433,"dashW":264,"dashL":109}}</title></head><body>
+<h3>320</h3><iframe id="f320" width="320" height="2400" src="../index.html"></iframe>
+<h3>360</h3><iframe id="f360" width="360" height="2400" src="../index.html"></iframe>
+<h3>390</h3><iframe id="f390" width="390" height="2400" src="../index.html"></iframe>
+<h3>414</h3><iframe id="f414" width="414" height="2400" src="../index.html"></iframe>
+<h3>480</h3><iframe id="f480" width="480" height="2400" src="../index.html"></iframe>
+<script>
+var pending={320:1,360:1,390:1,414:1,480:1};
+[320,360,390,414,480].forEach(function(w){
+  var fr=document.getElementById('f'+w);
+  fr.addEventListener('load',function(){delete pending[w];tryGo()});
+  fr.src='../index.html';
+});
+function tryGo(){
+  if(Object.keys(pending).length)return;
+  var out={};
+  [320,360,390,414,480].forEach(function(w){
+    try{
+      var win=document.getElementById('f'+w).contentWindow,d=win.document;
+      var h1=d.querySelector('.hero-copy h1'),hv=d.querySelector('.hero-visual'),dash=d.querySelector('.dash');
+      out[w]={deSW:d.documentElement.scrollWidth,
+        mq480:win.matchMedia('(max-width:480px)').matches,
+        h1fs:h1?getComputedStyle(h1).fontSize:'-',h1w:h1?Math.round(h1.getBoundingClientRect().width):0,
+        f:hv?getComputedStyle(hv).getPropertyValue('--f').trim():'-',
+        hvL:Math.round(hv.getBoundingClientRect().left),hvR:Math.round(hv.getBoundingClientRect().right),
+        dashW:Math.round(dash.getBoundingClientRect().width),dashL:Math.round(dash.getBoundingClientRect().left)};
+    }catch(e){out[w]='ERR '+e.message}
+  });
+  document.title='PROBE '+JSON.stringify(out);
+}
+</script>
+</body></html>

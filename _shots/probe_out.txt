@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>overflow-x lock probe</title></head>
+<body style="margin:0">
+<pre id="out">PROBE::[{"w":320,"client":310,"scroll":310,"htmlOvX":"clip","bodyOvX":"clip","obX":"none","overflow":false,"pannedByJs":0,"n":0,"list":[]},{"w":360,"client":350,"scroll":350,"htmlOvX":"clip","bodyOvX":"clip","obX":"none","overflow":false,"pannedByJs":0,"n":0,"list":[]},{"w":1440,"client":1430,"scroll":1430,"htmlOvX":"clip","bodyOvX":"clip","obX":"none","overflow":false,"pannedByJs":0,"n":0,"list":[]},{"w":390,"client":380,"scroll":380,"htmlOvX":"clip","bodyOvX":"clip","obX":"none","overflow":false,"pannedByJs":0,"n":0,"list":[]},{"w":414,"client":404,"scroll":404,"htmlOvX":"clip","bodyOvX":"clip","obX":"none","overflow":false,"pannedByJs":0,"n":0,"list":[]}]</pre>
+<script>
+/* Stricter than audit_text.html: proves the horizontal pan-lock at ENGINE level.
+   Per width W it reports: computed overflow-x of html+body, overscroll-behavior,
+   scroll==client, ALL out-of-bounds element rects, and whether the scroller can
+   actually be dragged sideways (scrollLeft assignment result). w=1440 is the
+   desktop control: same locks must hold while pixel layout stays untouched. */
+var W=[320,360,390,414,1440],out=[],done=0;
+W.forEach(function(w){
+  var f=document.createElement('iframe');
+  f.style.cssText='border:0;display:block;width:'+w+'px;height:900px';
+  f.src='../index.html';
+  f.onload=function(){
+    setTimeout(function(){
+    try{
+      var d=f.contentDocument,cw=d.documentElement.clientWidth,
+          sw=(d.scrollingElement||d.documentElement).scrollWidth,
+          cs=function(el){return f.contentWindow.getComputedStyle(el)},
+          hx=cs(d.documentElement).overflowX,bx=cs(d.body).overflowX,
+          ob=cs(d.documentElement).overscrollBehaviorX,offs=[];
+      d.querySelectorAll('body *').forEach(function(el){
+        var r=el.getBoundingClientRect();
+        if(r.right>cw+1||r.left<-1){
+          var c=el.className;
+          c=(typeof c==='string')?c.split(' ')[0]:'svg';
+          offs.push(el.tagName+'.'+c+' L'+Math.round(r.left)+' R'+Math.round(r.right));
+        }
+      });
+      offs=offs.slice(0,14);
+      var se=d.scrollingElement||d.documentElement;
+      se.scrollLeft=60;var panned=se.scrollLeft;se.scrollLeft=0;
+      out.push({w:w,client:cw,scroll:sw,htmlOvX:hx,bodyOvX:bx,obX:ob,
+                overflow:sw>cw+1,pannedByJs:panned,n:offs.length,list:offs});
+      }catch(e){out.push({w:w,err:String(e)});}
+      if(++done===W.length)document.getElementById('out').textContent='PROBE::'+JSON.stringify(out);
+    },700);
+  };
+  document.body.appendChild(f);
+});
+</script><iframe src="../index.html" style="border: 0px; display: block; width: 320px; height: 900px;"></iframe><iframe src="../index.html" style="border: 0px; display: block; width: 360px; height: 900px;"></iframe><iframe src="../index.html" style="border: 0px; display: block; width: 390px; height: 900px;"></iframe><iframe src="../index.html" style="border: 0px; display: block; width: 414px; height: 900px;"></iframe><iframe src="../index.html" style="border: 0px; display: block; width: 1440px; height: 900px;"></iframe>
+</body></html>

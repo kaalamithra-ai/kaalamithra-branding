@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;background:#222}iframe{border:2px solid red;display:block;margin:10px}h3{color:#fff;font-family:monospace;margin:8px 10px 0}</style></head><body>
+<h3>320 - trust card</h3><iframe id="g1" width="320" height="700"></iframe>
+<h3>320 - register form</h3><iframe id="g2" width="320" height="700"></iframe>
+<h3>320 - faq</h3><iframe id="g3" width="320" height="700"></iframe>
+<h3>320 - footer</h3><iframe id="g4" width="320" height="700"></iframe>
+<h3>390 - trust card</h3><iframe id="g5" width="390" height="700"></iframe>
+<h3>390 - footer</h3><iframe id="g6" width="390" height="700"></iframe>
+<script>
+var jobs=[['g1','.trust-card'],['g2','#register'],['g3','#faq'],['g4','.site-footer'],['g5','.trust-card'],['g6','.site-footer']];
+var left=jobs.length;
+jobs.forEach(function(j){
+  var fr=document.getElementById(j[0]);
+  fr.addEventListener('load',function(){
+    setTimeout(function(){
+      try{
+        var d=fr.contentDocument,s=d.createElement('style');
+        d.documentElement.style.scrollBehavior='auto';
+        s.textContent='.reveal{opacity:1!important;transform:none!important;transition:none!important}';
+        d.head.appendChild(s);
+        var t=d.querySelector(j[1]);
+        if(t){
+          var y=t.getBoundingClientRect().top+fr.contentWindow.pageYOffset-6;
+          fr.contentWindow.scrollTo(0,y);
+        }
+      }catch(e){}
+      if(--left===0)document.title='LOWERDONE';
+    },400);
+  });
+  fr.src='../index.html';
+});
+</script>
+</body></html>
