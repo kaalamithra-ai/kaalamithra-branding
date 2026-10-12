@@ -117,4 +117,44 @@
       ok.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
+
+  /* ---------- contact form (Web3Forms AJAX submit) ---------- */
+  var contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    var submitBtn = document.getElementById('contactSubmit');
+    var okBox = document.getElementById('contactSuccess');
+    var errBox = document.getElementById('contactError');
+    var btnLabel = submitBtn.textContent;
+
+    contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!contactForm.checkValidity()) { contactForm.reportValidity(); return; }
+
+      okBox.style.display = 'none';
+      errBox.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+
+      fetch(contactForm.action, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: new FormData(contactForm)
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.success) {
+            contactForm.reset();
+            okBox.style.display = 'block';
+            okBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            errBox.style.display = 'block';
+          }
+        })
+        .catch(function () { errBox.style.display = 'block'; })
+        .then(function () {
+          submitBtn.disabled = false;
+          submitBtn.textContent = btnLabel;
+        });
+    });
+  }
 })();
